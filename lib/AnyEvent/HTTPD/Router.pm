@@ -10,9 +10,16 @@ our $VERSION = '0.0.1';
 sub new {
     my $this  = shift;
     my $class = ref($this) || $this;
-    my $self  = $class->SUPER::new(
-        @_
-    );
+    my %args  = @_;
+
+    # todo documentation how to overwrite your dispathing
+    my $dispatcher       = delete $args{dispatcher};
+    my $dispatcher_class = delete $args{dispatcher_class};
+    my $self             = $class->SUPER::new(%args);
+    $self->{dispatcher}  = defined $dispatcher
+        ? $dispatcher
+        : $dispatcher_class->new();
+
 
     $self->req_cb(
         '' => sub {
@@ -28,41 +35,30 @@ sub new {
         },
     );
 
-    # TODO set via constructor
-    # TODO is //= allowed? minimum perl version?
-    $self->{route_class} //= 'AnyEvent::HTTPD::Router::Route';
-    $self->{_routes} = [];
-
+    # TODO bless
     return $self;
 }
 
-sub routes {
+sub dispatcher {
     my $self = shift;
-    return @{ $self->{_routes} };
+    $self->{dispatcher} = shift if @_ == 1;
+    return $self->{dispatcher};
 }
 
 sub reg_routes {
     my $self = shift;
     my $route_class = $self->{route_class};
     croak 'arguments to reg_routes are confusing' if @_ % 3 != 0;
-    while (my ($verb, $path, $cb) = splice(@_, 0, 3) ) {
-        my $route = $route_class->new($verb, $path, $cb);
-        push @{ $self->{_routes} }, $route;
+    while (my ($verbs, $path, $cb) = splice(@_, 0, 3) ) {
+        $self->dispatcher->add_route($verbs, $path, $cb);
     }
 }
 
 sub dispatch_requests {
     my $self    = shift;
     my $req     = shift;
-    my $matched = 0;
-    # TODO documentation: order of the routes is relevant!!
-    foreach my $route ($self->routes) {
-        if ($route->match( $req )) {
-            $self->event( xxx => $req );
-            ++$matched;
-            last;
-        }
-    }
+    my $matched = $self->dispatcher->match( $req );
+
     unless ($matched) {
         # TODO document not_found event
         $self->event(not_found => $req);
