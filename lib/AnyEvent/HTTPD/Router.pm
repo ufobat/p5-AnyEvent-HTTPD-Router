@@ -1,10 +1,12 @@
 package AnyEvent::HTTPD::Router;
 
 use common::sense;
+use parent 'AnyEvent::HTTPD';
+
 use AnyEvent::HTTPD;
 use Carp;
 
-use parent 'AnyEvent::HTTPD';
+use AnyEvent::HTTPD::Router::DefaultDispatcher;
 our $VERSION = '0.0.1';
 
 sub new {
@@ -12,10 +14,14 @@ sub new {
     my $class = ref($this) || $this;
     my %args  = @_;
 
+
     # todo documentation how to overwrite your dispathing
     my $dispatcher       = delete $args{dispatcher};
-    my $dispatcher_class = delete $args{dispatcher_class};
-    my $self             = $class->SUPER::new(%args);
+    my $dispatcher_class = delete $args{dispatcher_class}
+        || 'AnyEvent::HTTPD::Router::DefaultDispatcher';
+
+    my $self = $class->SUPER::new(%args);
+
     $self->{dispatcher}  = defined $dispatcher
         ? $dispatcher
         : $dispatcher_class->new();
@@ -38,7 +44,6 @@ sub new {
         },
     );
 
-    # TODO bless
     return $self;
 }
 
@@ -51,6 +56,7 @@ sub dispatcher {
 sub reg_routes {
     my $self = shift;
     my $route_class = $self->{route_class};
+
     croak 'arguments to reg_routes are confusing' if @_ % 3 != 0;
     while (my ($verbs, $path, $cb) = splice(@_, 0, 3) ) {
         $self->dispatcher->add_route($verbs, $path, $cb);
@@ -63,7 +69,7 @@ sub reg_routes {
 sub dispatch_requests {
     my $self    = shift;
     my $req     = shift;
-    my $matched = $self->dispatcher->match( $req );
+    my $matched = $self->dispatcher->match( $self, $req );
 
     unless ($matched) {
         # TODO document not_found event

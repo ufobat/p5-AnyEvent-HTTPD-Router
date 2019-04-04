@@ -39,30 +39,32 @@ sub add_route {
 # if you subclass AnyEvent::HTTPD::Request
 # you might need to change the match code.
 sub match {
-    my $self = shift;
-    my $req  = shift;
+    my $self    = shift;
+    my $httpd   = shift;
+    my $req     = shift;
     my $matched = 0;
-    my @path   = $req->url->path_segments;
-    my $method = $req->method;
+    my @path    = $req->url->path_segments;
+    my $method  = $req->method;
 
     # TODO: is that correct?
     # accept verb only for GET and POST
-    if ($method eq 'GET' or $method eq 'POST') {
-        if (@path[-1] =~ s/:(\w+)$//) { # TODO regex for verbs
-            $method = $1
+    if ( $method eq 'GET' or $method eq 'POST' ) {
+        if ( @path[-1] =~ s/:(\w+)$// ) {    # TODO regex for verbs
+            $method = $1;
         }
     }
 
     # sort because we want to have reproducable
     # behaviour for match
-    foreach my $path (keys %{ $self->{routes} }) {
+    foreach my $path ( keys %{ $self->{routes} } ) {
         my $NEED_A_NAME = $self->{routes}->{$path};
+
         # step 1: match the paths
-        if (my %variables = _match_paths(\@path, $NEED_A_NAME->segments)) {
-            if (exists $NEED_A_NAME->{callbacks}->{$method}) {
+        if ( my %variables = _match_paths( \@path, $NEED_A_NAME->{segments} ) ) {
+            if ( exists $NEED_A_NAME->{callbacks}->{$method} ) {
                 my $cb = $NEED_A_NAME->{callbacks}->{$method};
                 $matched = 1;
-                $cb->($req, \%variables);
+                $cb->( $httpd, $req, \%variables );
                 last;
             }
         }
@@ -70,7 +72,7 @@ sub match {
     return $matched;
 }
 
-sub _match_path {
+sub _match_paths {
     my $request_path_seq;
     my $routing_path_seq;
 
