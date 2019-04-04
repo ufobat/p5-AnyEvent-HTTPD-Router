@@ -19,7 +19,7 @@ sub new {
     $self->{dispatcher}  = defined $dispatcher
         ? $dispatcher
         : $dispatcher_class->new();
-    
+
     # set allowed methods to GET until we get some routes
     # why GET? because :verbs will need at least one real HTTP method
     $self->allowed_methods(['GET']);
@@ -55,8 +55,8 @@ sub reg_routes {
     while (my ($verbs, $path, $cb) = splice(@_, 0, 3) ) {
         $self->dispatcher->add_route($verbs, $path, $cb);
     }
-    
-    # TODO need to get http methods into allowed methods 
+
+    # TODO need to get http methods into allowed methods
     # from routes
 }
 

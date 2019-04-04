@@ -83,11 +83,11 @@ sub _match_path {
         $routing_seq = shift @$routing_path_seq; # maybe undef
 
         # TODO not sure if we need to do that explicty, (same as else)
-        # PK: we get a lot of warnings otherwise 
+        # PK: we get a lot of warnings otherwise
         if (not defined $routing_seq) {
             return;
         }
-        
+
         if ($routing_seq eq '*') {
             # done with all matching,
             # * slurps all the $request_seq that still might come
