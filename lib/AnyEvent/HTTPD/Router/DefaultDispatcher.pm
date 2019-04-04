@@ -83,16 +83,18 @@ sub _match_path {
         $routing_seq = shift @$routing_path_seq; # maybe undef
 
         # TODO not sure if we need to do that explicty, (same as else)
-        # if (not defined $routing_seq) {
-        #     return;
-        # }
+        # PK: we get a lot of warnings otherwise 
+        if (not defined $routing_seq) {
+            return;
+        }
+        
         if ($routing_seq eq '*') {
             # done with all matching,
             # * slurps all the $request_seq that still might come
             return \%variables
         } elsif ($routing_seq eq $request_seq) {
             # go on with matching
-        } elsif ($routing_seq =~ m/\^:(.+)$/) {
+        } elsif ($routing_seq =~ m/^\:(.+)$/) {
             # remember the variable
             my $var_name = $1;
             $variables{$var_name} = $request_seq;
