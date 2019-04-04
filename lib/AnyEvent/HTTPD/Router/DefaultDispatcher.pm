@@ -10,10 +10,10 @@ sub new {
         routes => {}
     };
 
-    return bless $class, $self;
+    return bless $self, $class;
 }
 
-sub add_routes {
+sub add_route {
     my $self  = shift;
     my $verbs = shift;
     my $path  = shift;
@@ -22,7 +22,7 @@ sub add_routes {
     unless (exists $self->{routes}->{$path}) {
         my @segments = split /\//, $path;
         $self->{routes}->{$path} = {
-            seqments  => \@seqments, # something to improve speed
+            segments  => \@segments, # something to improve speed
             callbacks => {},         # method/path => cb mapping
         };
     }
@@ -58,7 +58,7 @@ sub match {
     foreach my $path (keys %{ $self->{routes} }) {
         my $NEED_A_NAME = $self->{routes}->{$path};
         # step 1: match the paths
-        if (my %variables = _match_paths(\@path, $NEED_A_NAME->seqments)) {
+        if (my %variables = _match_paths(\@path, $NEED_A_NAME->segments)) {
             if (exists $NEED_A_NAME->{callbacks}->{$method}) {
                 my $cb = $NEED_A_NAME->{callbacks}->{$method};
                 $matched = 1;
