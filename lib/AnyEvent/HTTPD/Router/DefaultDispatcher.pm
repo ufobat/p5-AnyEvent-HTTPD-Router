@@ -59,12 +59,12 @@ sub match {
     foreach my $path ( keys %{ $self->{routes} } ) {
         my $NEED_A_NAME = $self->{routes}->{$path};
 
-        # step 1: match the paths
-        if ( my %variables = _match_paths( \@path, $NEED_A_NAME->{segments} ) ) {
-            if ( exists $NEED_A_NAME->{callbacks}->{$method} ) {
-                my $cb = $NEED_A_NAME->{callbacks}->{$method};
+        # step 1: match the method/verb
+        if ( my $cb = $NEED_A_NAME->{callbacks}->{$method} ) {
+            # step 2: match the path
+            if ( my $variables = _match_paths( \@path, $NEED_A_NAME->{segments} ) ) {
                 $matched = 1;
-                $cb->( $httpd, $req, \%variables );
+                $cb->( $httpd, $req, $variables );
                 last;
             }
         }
@@ -73,16 +73,17 @@ sub match {
 }
 
 sub _match_paths {
-    my $request_path_seq;
-    my $routing_path_seq;
+    # copies
+    my @request_path_seq = @{ +shift };
+    my @routing_path_seq = @{ +shift };
 
     my $request_seq;
     my $routing_seq;
     my %variables;
 
-    while (@$request_path_seq) {
-        $request_seq = shift @$request_path_seq; # always defined
-        $routing_seq = shift @$routing_path_seq; # maybe undef
+    while (@request_path_seq) {
+        $request_seq = shift @request_path_seq; # always defined
+        $routing_seq = shift @routing_path_seq; # maybe undef
 
         # TODO not sure if we need to do that explicty, (same as else)
         # PK: we get a lot of warnings otherwise
