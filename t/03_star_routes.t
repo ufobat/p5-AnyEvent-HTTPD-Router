@@ -36,5 +36,13 @@ $req = MockedRequest->new(GET => 'http://localhost/foo/bar/yada');
 %param_expectation = ( '*' => 'bar/yada');
 is $router->match($httpd, $req), 1, 'matched 2';
 
+$req = MockedRequest->new(GET => 'http://localhost/bar/*bar');
+%param_expectation = ();
+is $router->match($httpd, $req), 1, 'matched literal';
+
+$req = MockedRequest->new(GET => 'http://localhost/foobar/yada*');
+%param_expectation = ();
+is $router->match($httpd, $req), 1, 'matched literal';
+
 done_testing;
 
