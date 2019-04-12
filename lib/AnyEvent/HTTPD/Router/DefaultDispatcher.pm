@@ -13,11 +13,44 @@ sub new {
     return bless $self, $class;
 }
 
+sub _check_verbs {
+    my $verbs = shift;
+    if ( ref($verbs) eq 'ARRAY' ) {
+        foreach my $verb (@$verbs) {
+            return unless _check_verb($verb);
+        }
+        return 1;
+    }
+    return _check_verb($verbs);
+}
+
+sub _check_verb {
+    my $verb = shift;
+    if ( $verb =~ m/^:/ ) {
+        return 1;
+    }
+    else {
+        return grep { $verb eq $_ }
+            qw/GET HEAD POST PUT PATCH DELETE TRACE OPTIONS CONNECT/;
+    }
+    return;
+}
+
 sub add_route {
     my $self  = shift;
     my $verbs = shift;
     my $path  = shift;
     my $cb    = shift;
+
+    if ( not ref($cb) eq 'CODE' ) {
+        croak 'callback must be a coderef';
+    }
+    elsif ( not _check_verbs($verbs) ) {
+        croak 'verbs or methods are wrong';
+    }
+    elsif ( not $path =~ m/^\// ) {
+        croak 'path syntax is wrong';
+    }
 
     unless (exists $self->{routes}->{$path}) {
         my @segments = split /\//, $path;

@@ -26,11 +26,6 @@ sub new {
         ? $dispatcher
         : $dispatcher_class->new();
 
-    # set allowed methods to GET until we get some routes
-    # why GET? because :verbs will need at least one real HTTP method
-    # # mb: default is GET, HEAD and POST i dont see why we should change that
-    # # $self->allowed_methods(['GET']);
-
     $self->reg_cb(
         'request' => sub {
             my $self = shift;
@@ -51,6 +46,7 @@ sub dispatcher { shift->{dispatcher} }
 sub reg_routes {
     my $self = shift;
 
+    croak 'arguemnts to reg_routes are required' if @_ == 0;
     croak 'arguments to reg_routes are confusing' if @_ % 3 != 0;
     while (my ($verbs, $path, $cb) = splice(@_, 0, 3) ) {
         $self->dispatcher->add_route($verbs, $path, $cb);
