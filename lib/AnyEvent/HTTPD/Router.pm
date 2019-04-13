@@ -58,3 +58,91 @@ sub reg_routes {
 
 1;
 
+__END__
+
+=pod
+
+=head1 NAME AnyEvent::HTTPD::Router
+
+Adding Routes to AnyEvent::HTTPD
+
+=head1 DESCRIPTION
+
+todo motivation = wenige abhaengigkeiten, schnell, einfach, erweiterbar
+
+=head1 SYNOPSIS
+
+ use AnyEvent::HTTPD::Router;
+
+ my $httpd       = AnyEvent::HTTPD::Router->new( port => 1337 );
+ my $all_methods = [qw/GET DELETE HEAD POST PUT PATCH/];
+
+ $httpd->reg_routes(
+     GET => '/index.txt' => sub {
+         my ( $httpd, $req ) = @_;
+         $httpd->stop_request;
+         $req->respond([ 200, 'ok', { 'Content-Type' => 'text/plain', }, "test!" ] );
+     },
+     $all_methods => '/my-method' => sub {
+         my ( $httpd, $req ) = @_;
+         $httpd->stop_request;
+         $req->respond([ 200, 'ok', { 'X-Your-Method' => $req->method }, '' ]);
+      },
+ );
+
+ $httpd->run();
+
+=head1 METHODS
+
+=over
+
+=item * C<new()>
+
+=item * C<reg_routes()>
+
+=item * C<*>
+
+C<AnyEvent::HTTPD::Router> subclasses C<AnyEvent::HTTPD> so you can use all methods the parent class.
+
+=back
+
+=head1 WRITING YOUR OWN ROUTE DISPATCHER
+
+TODO
+
+=head1 SEE ALSO
+
+=over
+
+=item * L<AnyEvent>
+
+=item * L<AnyEvent::HTTPD>
+
+=back
+
+There are various different Router Implementations that you could use in your own Route Dispatcher.
+
+=over
+
+=item C<HTTP::Router>
+
+=item .... TODO
+
+=back
+
+=head1 AUTHORS, COPYRIGHT & LICNESE
+
+=over
+
+=item Martin Barth (ufobat)
+
+=item Paul Koschinksi
+
+=back
+
+Copyright 2019, Martin Barth
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut
