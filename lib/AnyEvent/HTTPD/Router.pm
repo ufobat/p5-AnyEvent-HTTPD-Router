@@ -162,14 +162,16 @@ Copyright (C) Martin Barth.
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
 
-=head1 AUTHOR
+=head1 CONTRIBUTORS
 
 =over
 
-=item * Martin Barth (ufobat)
-
-=item * Paul Koschinski
+=item Paul Koschinski
 
 =back
+
+=head1 AUTHOR
+
+Martin Barth (ufobat)
 
 =cut

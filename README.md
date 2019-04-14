@@ -78,7 +78,10 @@ Copyright (C) Martin Barth.
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
 
+# CONTRIBUTORS
+
+- Paul Koschinski
+
 # AUTHOR
 
-- Martin Barth (ufobat)
-- Paul Koschinski
+Martin Barth (ufobat)
