@@ -17,6 +17,7 @@ sub new {
 
     # todo documentation how to overwrite your dispathing
     my $dispatcher       = delete $args{dispatcher};
+    my $routes           = delete $args{routes};
     my $dispatcher_class = delete $args{dispatcher_class}
         || 'AnyEvent::HTTPD::Router::DefaultDispatcher';
 
@@ -34,8 +35,8 @@ sub new {
         },
     );
 
-    if ($args{routes}) {
-        $self->reg_routes( @{ $args{routes} } );
+    if ($routes) {
+        $self->reg_routes( @$routes );
     }
 
     return $self;
@@ -98,7 +99,27 @@ todo motivation = wenige abhaengigkeiten, schnell, einfach, erweiterbar
 
 =item * C<new()>
 
+Creates a new C<AnyEvent::HTTP::Router> server. The constructor handles following parameters. All further parameters are passed to C<AnyEvent::HTTPD>.
+
+=over
+
+=item * C<dispatcher>
+
+You can pass your own implementation of your router dispatcher into this Module. This expects the dispatcher to be an instance not a class name.
+
+=item * C<dispatcher_class>
+
+You can pass your own implementation of your router dispatcher into this Module. This expects the dispatcher to be a class name.
+
+=item * C<routes>
+
+You can add the routes at the constructor. This is an ArrayRef.
+
+=back
+
 =item * C<reg_routes()>
+
+You can add further routes with this method.
 
 =item * C<*>
 
@@ -120,13 +141,17 @@ TODO
 
 =back
 
-There are various different Router Implementations that you could use in your own Route Dispatcher.
+There are a lot of HTTP Router modules in CPAN:
 
 =over
 
-=item C<HTTP::Router>
+=item * L<HTTP::Router>
 
-=item .... TODO
+=item * L<Router::Simple>
+
+=item * L<Router::R3>
+
+=item * L<Router::Boom>
 
 =back
 
@@ -141,7 +166,7 @@ it under the same terms as Perl itself.
 
 =over
 
-=item * Martin Barth E<lt>martin@senfdax.deE<gt>
+=item * Martin Barth (ufobat)
 
 =item * Paul Koschinski
 
