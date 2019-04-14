@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/ufobat/p5-AnyEvent-HTTTPD-Router.svg?branch=master)](https://travis-ci.org/ufobat/p5-AnyEvent-HTTTPD-Router)
+[![Build Status](https://travis-ci.org/ufobat/p5-AnyEvent-HTTPD-Router.svg?branch=master)](https://travis-ci.org/ufobat/p5-AnyEvent-HTTPD-Router)
 # NAME
 
 AnyEvent::HTTPD::Router - Adding Routes to AnyEvent::HTTPD

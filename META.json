@@ -56,13 +56,13 @@
    "release_status" : "unstable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/ufobat/p5-AnyEvent-HTTTPD-Router/issues"
+         "web" : "https://github.com/ufobat/p5-AnyEvent-HTTPD-Router/issues"
       },
-      "homepage" : "https://github.com/ufobat/p5-AnyEvent-HTTTPD-Router",
+      "homepage" : "https://github.com/ufobat/p5-AnyEvent-HTTPD-Router",
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/ufobat/p5-AnyEvent-HTTTPD-Router.git",
-         "web" : "https://github.com/ufobat/p5-AnyEvent-HTTTPD-Router"
+         "url" : "git://github.com/ufobat/p5-AnyEvent-HTTPD-Router.git",
+         "web" : "https://github.com/ufobat/p5-AnyEvent-HTTPD-Router"
       }
    },
    "version" : "0.0.1",
