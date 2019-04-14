@@ -24,7 +24,22 @@ todo motivation = wenige abhaengigkeiten, schnell, einfach, erweiterbar
             my ( $httpd, $req ) = @_;
             $httpd->stop_request;
             $req->respond([ 200, 'ok', { 'X-Your-Method' => $req->method }, '' ]);
-         },
+        },
+        GET => '/calendar/:year/:month/:day' => sub {
+            my ( $httpd, $req, $param ) = @_;
+            my $calendar_entries = get_cal_entries($param->{year}, $param->{month}, $param->{day});
+
+            $httpd->stop_request;
+            $reg->respond([ 200, 'ok', { 'Content-Type' => 'application/json'}, to_json($calendar_entries)]);
+        },
+        GET => '/static-files/*' => sub {
+            my ( $httpd, $req, $param ) = @_;
+            my $requeted_file = $param->{'*'};
+            my ($content, $content_type) = black_magic($requested_file);
+
+            $httpd->stop_request;
+            $req->respond([ 200, 'ok', { 'Content-Type' => $content_type }, $content ]);
+        }
     );
 
     $httpd->run();
