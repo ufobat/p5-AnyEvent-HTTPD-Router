@@ -60,11 +60,11 @@ sub reg_routes {
 
 __END__
 
-=pod
+=encoding utf-8
 
-=head1 NAME AnyEvent::HTTPD::Router
+=head1 NAME
 
-Adding Routes to AnyEvent::HTTPD
+AnyEvent::HTTPD::Router - Adding Routes to AnyEvent::HTTPD
 
 =head1 DESCRIPTION
 
@@ -130,19 +130,21 @@ There are various different Router Implementations that you could use in your ow
 
 =back
 
-=head1 AUTHORS, COPYRIGHT & LICNESE
+=head1 LICENSE
+
+Copyright (C) Martin Barth.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=head1 AUTHOR
 
 =over
 
-=item Martin Barth (ufobat)
+=item * Martin Barth E<lt>martin@senfdax.deE<gt>
 
-=item Paul Koschinksi
+=item * Paul Koschinski
 
 =back
-
-Copyright 2019, Martin Barth
-
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
 
 =cut
