@@ -5,7 +5,19 @@ AnyEvent::HTTPD::Router - Adding Routes to AnyEvent::HTTPD
 
 # DESCRIPTION
 
-todo motivation = wenige abhaengigkeiten, schnell, einfach, erweiterbar
+AnyEvent::HTTPD::Router is an extention of the `AnyEvent::HTTPD` module, from which it is inheriting.
+It adds the `reg_routes()` method to it.
+
+This module aims to add as little as possible overhead to it while still being flexible and extendable.
+It requires the same little dependencys that AnyEvent::HTTPD uses.
+
+The dispatching for the routes happens at first. If no route could be found, or you do not stop further
+dispatching with `stop_request()` the regitered callbacks will be executed as well; as if you would use
+AnyEvent::HTTPD. In other words, if you plan to use routes in your project you can use this module and
+upgrade from callbacks to routes step by step.
+
+Routes support http methods, but custom methods [https://cloud.google.com/apis/design/custom\_methods](https://cloud.google.com/apis/design/custom_methods)
+can also be used. You dont need to, of course ;-)
 
 # SYNOPSIS
 
@@ -62,9 +74,10 @@ todo motivation = wenige abhaengigkeiten, schnell, einfach, erweiterbar
 
         You can add the routes at the constructor. This is an ArrayRef.
 
-- `reg_routes()`
+- `reg_routes( [$method, $path, $callback]* )`
 
-    You can add further routes with this method.
+    You can add further routes with this method. Multiple routes can be added at once. To add a route
+    you need do add 3 parameters: &lt;method>, &lt;path>, &lt;callback>.
 
 - `*`
 
@@ -72,7 +85,7 @@ todo motivation = wenige abhaengigkeiten, schnell, einfach, erweiterbar
 
 # WRITING YOUR OWN ROUTE DISPATCHER
 
-TODO
+If you want to change the implementation of the Dispatching you specify the `dispatcher` or `dispatcher_class`.
 
 # SEE ALSO
 
