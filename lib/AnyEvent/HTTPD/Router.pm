@@ -183,6 +183,10 @@ There are a lot of HTTP Router modules in CPAN:
 
 =back
 
+=head1 BUILDING AND RELEASING THIS MODULE
+
+This module uses L<https://metacpan.org/pod/Minilla>.
+
 =head1 LICENSE
 
 Copyright (C) Martin Barth.

@@ -99,6 +99,10 @@ There are a lot of HTTP Router modules in CPAN:
 - [Router::R3](https://metacpan.org/pod/Router::R3)
 - [Router::Boom](https://metacpan.org/pod/Router::Boom)
 
+# BUILDING AND RELEASING THIS MODULE
+
+This module uses [https://metacpan.org/pod/Minilla](https://metacpan.org/pod/Minilla).
+
 # LICENSE
 
 Copyright (C) Martin Barth.
