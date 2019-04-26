@@ -14,10 +14,6 @@ sub new {
     my $class = ref($this) || $this;
     my %args  = @_;
 
-	# set allowed methods to GET until we get some routes
-    # why GET? because :verbs will need at least one real HTTP method
-    $args{allowed_methods} = ['GET'] unless $args{allowed_methods};
-
     # todo documentation how to overwrite your dispathing
     my $dispatcher       = delete $args{dispatcher};
     my $routes           = delete $args{routes};
@@ -52,7 +48,6 @@ sub reg_routes {
 
     croak 'arguments to reg_routes are required' if @_ == 0;
     croak 'arguments to reg_routes are confusing' if @_ % 3 != 0;
-    my $route_class = $self->{route_class};
     my @methods = ();
     while (my ($verbs, $path, $cb) = splice(@_, 0, 3) ) {
     	push(@methods,ref($verbs) eq 'ARRAY' ? @$verbs : $verbs);
