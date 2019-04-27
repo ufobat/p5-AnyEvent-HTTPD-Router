@@ -17,6 +17,7 @@ sub new {
     # todo documentation how to overwrite your dispathing
     my $dispatcher       = delete $args{dispatcher};
     my $routes           = delete $args{routes};
+    my $auto_respond_404 = delete $args{auto_respond_404};
     my $dispatcher_class = delete $args{dispatcher_class}
         || 'AnyEvent::HTTPD::Router::DefaultDispatcher';
     my $known_methods    = delete $args{known_methods}
@@ -39,6 +40,11 @@ sub new {
             }
         },
     );
+
+    $self->reg_cb('no_route_found' => sub {
+        my ( $httpd, $req ) = @_;
+        $req->respond( [ 404, 'not found', {}, '' ] );
+    }) if $auto_respond_404;
 
     if ($routes) {
         $self->reg_routes( @$routes );
@@ -87,7 +93,8 @@ sub reg_routes {
             croak 'path syntax is wrong';
         }
         foreach my $verb (@$verbs) {
-            croak 'verbs or methods are wrong' unless $self->_check_verb( $verb, \%methods );
+            croak 'verbs or methods are wrong'
+                unless $self->_check_verb( $verb, \%methods );
         }
 
         $self->dispatcher->add_route($verbs, $path, $cb);
@@ -112,19 +119,22 @@ AnyEvent::HTTPD::Router - Adding Routes to AnyEvent::HTTPD
 
 =head1 DESCRIPTION
 
-AnyEvent::HTTPD::Router is an extension to the C<AnyEvent::HTTPD> module, from which it is inheriting.
-It adds the C<reg_routes()> method to it.
+AnyEvent::HTTPD::Router is an extension to the L<AnyEvent::HTTPD> module, from
+which it is inheriting. It adds the C<reg_routes()> method to it.
 
-This module aims to add as little as possible overhead to it while still being flexible and extendable.
-It requires the same little dependencies that AnyEvent::HTTPD uses.
+This module aims to add as little as possible overhead to it while still being
+flexible and extendable. It requires the same little dependencies that
+L<AnyEvent::HTTPD> uses.
 
-The dispatching for the routes happens first. If no route could be found, or you do not stop further
-dispatching with C<stop_request()> the registered callbacks will be executed as well; as if you would use
-AnyEvent::HTTPD. In other words, if you plan to use routes in your project you can use this module and
+The dispatching for the routes happens first. If no route could be found, or you
+do not stop further dispatching with C<stop_request()> the registered callbacks
+will be executed as well; as if you would use L<AnyEvent::HTTPD>. In other
+words, if you plan to use routes in your project you can use this module and
 upgrade from callbacks to routes step by step.
 
-Routes support http methods, but custom methods L<https://cloud.google.com/apis/design/custom_methods>
-can also be used. You don't need to, of course ;-)
+Routes support http methods, but custom methods
+L<https://cloud.google.com/apis/design/custom_methods> can also be used. You
+don't need to, of course ;-)
 
 =head1 SYNOPSIS
 
@@ -137,19 +147,26 @@ can also be used. You don't need to, of course ;-)
      GET => '/index.txt' => sub {
          my ( $httpd, $req ) = @_;
          $httpd->stop_request;
-         $req->respond([ 200, 'ok', { 'Content-Type' => 'text/plain', }, "test!" ] );
+         $req->respond([
+             200, 'ok', { 'Content-Type' => 'text/plain', }, "test!" ]);
      },
      $all_methods => '/my-method' => sub {
          my ( $httpd, $req ) = @_;
          $httpd->stop_request;
-         $req->respond([ 200, 'ok', { 'X-Your-Method' => $req->method }, '' ]);
+         $req->respond([
+             200, 'ok', { 'X-Your-Method' => $req->method }, '' ]);
      },
      GET => '/calendar/:year/:month/:day' => sub {
          my ( $httpd, $req, $param ) = @_;
-         my $calendar_entries = get_cal_entries($param->{year}, $param->{month}, $param->{day});
+         my $calendar_entries = get_cal_entries(
+             $param->{year}, $param->{month}, $param->{day}
+         );
 
          $httpd->stop_request;
-         $reg->respond([ 200, 'ok', { 'Content-Type' => 'application/json'}, to_json($calendar_entries)]);
+         $reg->respond([
+             200, 'ok', { 'Content-Type' => 'application/json'},
+             to_json($calendar_entries)
+         ]);
      },
      GET => '/static-files/*' => sub {
          my ( $httpd, $req, $param ) = @_;
@@ -157,7 +174,8 @@ can also be used. You don't need to, of course ;-)
          my ($content, $content_type) = black_magic($requested_file);
 
          $httpd->stop_request;
-         $req->respond([ 200, 'ok', { 'Content-Type' => $content_type }, $content ]);
+         $req->respond([
+             200, 'ok', { 'Content-Type' => $content_type }, $content ]);
      }
  );
 
@@ -169,17 +187,20 @@ can also be used. You don't need to, of course ;-)
 
 =item * C<new()>
 
-Creates a new C<AnyEvent::HTTPD::Router> server. The constructor handles the following parameters. All further parameters are passed to C<AnyEvent::HTTPD>.
+Creates a new C<AnyEvent::HTTPD::Router> server. The constructor handles the
+following parameters. All further parameters are passed to C<AnyEvent::HTTPD>.
 
 =over
 
 =item * C<dispatcher>
 
-You can pass your own implementation of your router dispatcher into this module. This expects the dispatcher to be an instance not a class name.
+You can pass your own implementation of your router dispatcher into this module.
+This expects the dispatcher to be an instance not a class name.
 
 =item * C<dispatcher_class>
 
-You can pass your own implementation of your router dispatcher into this module. This expects the dispatcher to be a class name.
+You can pass your own implementation of your router dispatcher into this module.
+This expects the dispatcher to be a class name.
 
 =item * C<routes>
 
@@ -187,19 +208,27 @@ You can add the routes at the constructor. This is an ArrayRef.
 
 =item * C<known_methods>
 
-Whenever you register a new route this modules checks if the method is either customer method prefixed with ':' or a $known_method.
-You would need to change this, if you would like to implement WebDAV, for example. This is an ArrayRef.
+Whenever you register a new route this modules checks if the method is either
+customer method prefixed with ':' or a $known_method. You would need to change
+this, if you would like to implement WebDAV, for example. This is an ArrayRef.
+
+=item * C<auto_respond_404>
+
+If the value for this parameter is set to true a a simple C<404> responder will
+be installed that responds if not route matches. You can implement your own
+handler see L<EVENTS>.
 
 =back
 
 =item * C<reg_routes( [$method, $path, $callback]* )>
 
-You can add further routes with this method. Multiple routes can be added at once. To add a route
-you need do add 3 parameters: <method>, <path>, <callback>.
+You can add further routes with this method. Multiple routes can be added at
+once. To add a route you need do add 3 parameters: <method>, <path>, <callback>.
 
 =item * C<*>
 
-C<AnyEvent::HTTPD::Router> subclasses C<AnyEvent::HTTPD> so you can use all methods the parent class.
+C<AnyEvent::HTTPD::Router> subclasses C<AnyEvent::HTTPD> so you can use all
+methods the parent class.
 
 =back
 
@@ -209,22 +238,29 @@ C<AnyEvent::HTTPD::Router> subclasses C<AnyEvent::HTTPD> so you can use all meth
 
 =item * no_route_found => $request
 
-When the dispatcher can not find a route that matches on your reuqest, the event C<no_route_found> will be emitted.
+When the dispatcher can not find a route that matches on your reuqest, the
+event C<no_route_found> will be emitted.
 
-In the case that routes and callbacks (C<reg_cb()>) for paths as used with C<AnyEvent::HTTPD> are mixed, keep in mind that that C<no_route_found> will
-happen before the other path callbacks are executed. So for a  C<404 not found> handler you could do
+In the case that routes and callbacks (C<reg_cb()>) for paths as used with
+C<AnyEvent::HTTPD> are mixed, keep in mind that that C<no_route_found> will
+happen before the other path callbacks are executed. So for a
+C<404 not found> handler you could do
 
     $httpd->reg_cb('' => sub {
         my ( $httpd, $req ) = @_;
         $req->respond( [ 404, 'not found', {}, '' ] );
     });
 
-If you just use C<reg_routes()> and don't mix with C<reg_cb()> for paths you could implement the C<404 not found> handler like this:
+If you just use C<reg_routes()> and don't mix with C<reg_cb()> for paths you
+could implement the C<404 not found> handler like this:
 
     $httpd->reg_cb('no_route_found' => sub {
         my ( $httpd, $req ) = @_;
         $req->respond( [ 404, 'not found', {}, '' ] );
     });
+
+This is excatly what you get if you specify C<auto_respond_404> at the
+constructor.
 
 =item * See L<AnyEvent::HTTPD/EVENTS>
 
@@ -232,7 +268,8 @@ If you just use C<reg_routes()> and don't mix with C<reg_cb()> for paths you cou
 
 =head1 WRITING YOUR OWN ROUTE DISPATCHER
 
-If you want to change the implementation of the dispatching you specify the C<dispatcher> or C<dispatcher_class>.
+If you want to change the implementation of the dispatching you specify the
+C<dispatcher> or C<dispatcher_class>.
 
 =head1 SEE ALSO
 
