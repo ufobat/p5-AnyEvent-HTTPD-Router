@@ -54,27 +54,19 @@ sub reg_routes {
         $self->dispatcher->add_route($verbs, $path, $cb);
     }
 
-	# need to get http methods into allowed methods
-
-    # remove :verbs from methods
-    @methods = grep { $_ !~ m/^\:/ } @methods;
-
-	# remove duplicates:
-	# mix allowed methods and new http methods together
+	## need to get http methods into allowed methods
+	# * remove duplicates
+	# * mix allowed methods and new http methods together
+    # * remove ':verbs' from methods
     my %methods;
-    map { $methods{$_}++ } ( @methods, @{$self->allowed_methods} );
+    $methods{$_}++ for @{$self->allowed_methods}, grep { $_ !~ m/^\:/ } @methods;
 
-    # get only the new ones - deduplicated
-    @methods = grep { 1 == $methods{$_}++ } @methods;
 
 	# set allowed methods new
 	# Todo: setter doesnt work in this AE::HTTPD version
 	# so must do push(@{$self->{allowed_methods}}
 	# later we can do setter if AE::HTTPD version is high enough
-	push(@{$self->{allowed_methods}},@methods);
-
-	# probably its better to add new methods into existing (push)
-	# to not overwrite methods due to non-blocking behaviour
+    $self->{allowed_methods} = [ keys %methods ];
 }
 
 1;
