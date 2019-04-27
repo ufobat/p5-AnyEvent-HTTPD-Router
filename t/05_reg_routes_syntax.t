@@ -55,5 +55,15 @@ throws_ok {
     $httpd->reg_routes( GET =>  'path syntax',  sub {} );
 } qr/path syntax/, 'invalid path syntax';
 
+$httpd = AnyEvent::HTTPD::Router->new(known_methods => ['GET']);
+throws_ok {
+    $httpd->reg_routes(POST => '/foo' => sub { });
+} qr/verbs or methods/, 'POST is no longer a known http method';
+
+$httpd = AnyEvent::HTTPD::Router->new(known_methods => ['GET', 'COPY']);
+lives_ok {
+    $httpd->reg_routes(COPY => '/foo' => sub { });
+} 'COPY is now an acceptable method';
+
 done_testing;
 

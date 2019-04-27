@@ -19,10 +19,13 @@ sub new {
     my $routes           = delete $args{routes};
     my $dispatcher_class = delete $args{dispatcher_class}
         || 'AnyEvent::HTTPD::Router::DefaultDispatcher';
+    my $known_methods    = delete $args{known_methods}
+        || [ qw/GET HEAD POST PUT PATCH DELETE TRACE OPTIONS CONNECT/ ];
 
     my $self = $class->SUPER::new(%args);
 
-    $self->{dispatcher}  = defined $dispatcher
+    $self->{known_methods} = $known_methods;
+    $self->{dispatcher}    = defined $dispatcher
         ? $dispatcher
         : $dispatcher_class->new();
 
@@ -44,20 +47,18 @@ sub new {
 sub dispatcher { shift->{dispatcher} }
 
 sub _check_verb {
+    my $self    = shift;
     my $verb    = shift;
     my $methods = shift;
 
     if ( $verb =~ m/^:/ ) {
-        # convert ':verbs' to POST and GET
-        $methods->{$_}++ for qw(GET POST);
+        $methods->{$_}++ for qw(GET POST);  # convert ':verbs' to POST and GET
         return 1;
-    }
-    elsif ( grep { $verb eq $_ }
-        qw/GET HEAD POST PUT PATCH DELETE TRACE OPTIONS CONNECT/ )
-    {
+    } elsif ( grep { $verb eq $_ } @{ $self->{known_methods} } ) {
         $methods->{$verb}++;
         return 1;
     }
+
     return;
 }
 
@@ -83,7 +84,7 @@ sub reg_routes {
             croak 'path syntax is wrong';
         }
         foreach my $verb (@$verbs) {
-            croak 'verbs or methods are wrong' unless _check_verb( $verb, \%methods );
+            croak 'verbs or methods are wrong' unless $self->_check_verb( $verb, \%methods );
         }
 
         $self->dispatcher->add_route($verbs, $path, $cb);
@@ -180,6 +181,11 @@ You can pass your own implementation of your router dispatcher into this module.
 =item * C<routes>
 
 You can add the routes at the constructor. This is an ArrayRef.
+
+=item * C<known_methods>
+
+Whenever you register a new route this modules checks if the method is either customer method prefixed with ':' or a $known_method.
+You would need to change this, if you would like to implement WebDAV, for example. This is an ArrayRef.
 
 =back
 
