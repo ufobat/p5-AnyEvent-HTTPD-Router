@@ -54,7 +54,7 @@ sub match {
 
     # sort because we want to have reproducable
     # behaviour for match
-    foreach my $path ( keys %{ $self->{routes} } ) {
+    foreach my $path ( sort keys %{ $self->{routes} } ) {
         my $NEED_A_NAME = $self->{routes}->{$path};
 
         # step 1: match the method/verb
