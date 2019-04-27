@@ -50,7 +50,7 @@ sub reg_routes {
     croak 'arguments to reg_routes are confusing' if @_ % 3 != 0;
     my @methods = ();
     while (my ($verbs, $path, $cb) = splice(@_, 0, 3) ) {
-    	push(@methods,ref($verbs) eq 'ARRAY' ? @$verbs : $verbs);
+        push(@methods,ref($verbs) eq 'ARRAY' ? @$verbs : $verbs);
         $self->dispatcher->add_route($verbs, $path, $cb);
     }
 
