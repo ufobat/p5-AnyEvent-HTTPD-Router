@@ -15,7 +15,7 @@ sub make_route_param {
         is $req->method, $method, 'method is correct';
         is $req->url->path, $url, 'url is correct';
     };
-    return ($method, $url, $cb);
+    return ([$method], $url, $cb);
 }
 
 

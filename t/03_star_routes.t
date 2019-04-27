@@ -18,7 +18,7 @@ sub make_route_param {
         is $req->method, $method, 'method is correct';
         is_deeply $param, \%param_expectation, 'parameters are correct'
     };
-    return ($method, $url, $cb);
+    return ([$method], $url, $cb);
 }
 
 my $httpd  = 'not needed here';

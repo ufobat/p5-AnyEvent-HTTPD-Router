@@ -43,6 +43,29 @@ sub new {
 
 sub dispatcher { shift->{dispatcher} }
 
+sub _check_verbs {
+    my $verbs = shift;
+    if ( ref($verbs) eq 'ARRAY' ) {
+        foreach my $verb (@$verbs) {
+            return unless _check_verb($verb);
+        }
+        return 1;
+    }
+    return _check_verb($verbs);
+}
+
+sub _check_verb {
+    my $verb = shift;
+    if ( $verb =~ m/^:/ ) {
+        return 1;
+    }
+    else {
+        return grep { $verb eq $_ }
+            qw/GET HEAD POST PUT PATCH DELETE TRACE OPTIONS CONNECT/;
+    }
+    return;
+}
+
 sub reg_routes {
     my $self = shift;
 
@@ -50,7 +73,20 @@ sub reg_routes {
     croak 'arguments to reg_routes are confusing' if @_ % 3 != 0;
     my @methods = ();
     while (my ($verbs, $path, $cb) = splice(@_, 0, 3) ) {
-        push(@methods,ref($verbs) eq 'ARRAY' ? @$verbs : $verbs);
+
+        if ( not ref($cb) eq 'CODE' ) {
+            croak 'callback must be a coderef';
+        }
+        elsif ( not _check_verbs($verbs) ) {
+            croak 'verbs or methods are wrong';
+        }
+        elsif ( not $path =~ m/^\// ) {
+            croak 'path syntax is wrong';
+        }
+
+        $verbs = ref($verbs) eq 'ARRAY' ? $verbs  : [ $verbs ];
+        push @methods, @$verbs;
+
         $self->dispatcher->add_route($verbs, $path, $cb);
     }
 
