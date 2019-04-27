@@ -27,9 +27,9 @@ sub add_route {
         };
     }
 
-    my $NEED_A_NAME = $self->{routes}->{$path};
+    my $dispatch_entry = $self->{routes}->{$path};
     foreach my $verb (@$verbs) {
-        $NEED_A_NAME->{callbacks}->{$verb} = $cb;
+        $dispatch_entry->{callbacks}->{$verb} = $cb;
     }
 }
 
@@ -50,12 +50,12 @@ sub match {
     # sort because we want to have reproducable
     # behaviour for match
     foreach my $path ( sort keys %{ $self->{routes} } ) {
-        my $NEED_A_NAME = $self->{routes}->{$path};
+        my $dispatch_entry = $self->{routes}->{$path};
 
         # step 1: match the method/verb
-        if ( my $cb = $NEED_A_NAME->{callbacks}->{$method} ) {
+        if ( my $cb = $dispatch_entry->{callbacks}->{$method} ) {
             # step 2: match the path
-            if ( my $variables = _match_paths( \@path, $NEED_A_NAME->{segments} ) ) {
+            if ( my $variables = _match_paths( \@path, $dispatch_entry->{segments} ) ) {
                 $matched = 1;
                 $cb->( $httpd, $req, $variables );
                 last;
