@@ -14,7 +14,6 @@ sub new {
     my $class = ref($this) || $this;
     my %args  = @_;
 
-
     # todo documentation how to overwrite your dispathing
     my $dispatcher       = delete $args{dispatcher};
     my $routes           = delete $args{routes};
@@ -47,14 +46,35 @@ sub dispatcher { shift->{dispatcher} }
 sub reg_routes {
     my $self = shift;
 
-    croak 'arguemnts to reg_routes are required' if @_ == 0;
+    croak 'arguments to reg_routes are required' if @_ == 0;
     croak 'arguments to reg_routes are confusing' if @_ % 3 != 0;
+    my @methods = ();
     while (my ($verbs, $path, $cb) = splice(@_, 0, 3) ) {
+    	push(@methods,ref($verbs) eq 'ARRAY' ? @$verbs : $verbs);
         $self->dispatcher->add_route($verbs, $path, $cb);
     }
 
-    # TODO need to get http methods into allowed methods
-    # from routes
+	# need to get http methods into allowed methods
+
+    # remove :verbs from methods
+    @methods = grep { $_ !~ m/^\:/ } @methods;
+
+	# remove duplicates:
+	# mix allowed methods and new http methods together
+    my %methods;
+    map { $methods{$_}++ } ( @methods, @{$self->allowed_methods} );
+
+    # get only the new ones - deduplicated
+    @methods = grep { 1 == $methods{$_}++ } @methods;
+
+	# set allowed methods new
+	# Todo: setter doesnt work in this AE::HTTPD version
+	# so must do push(@{$self->{allowed_methods}}
+	# later we can do setter if AE::HTTPD version is high enough
+	push(@{$self->{allowed_methods}},@methods);
+
+	# probably its better to add new methods into existing (push)
+	# to not overwrite methods due to non-blocking behaviour
 }
 
 1;
