@@ -143,7 +143,11 @@ don't need to, of course ;-)
 # WRITING YOUR OWN ROUTE DISPATCHER
 
 If you want to change the implementation of the dispatching you specify the
-`dispatcher` or `dispatcher_class`.
+`dispatcher` or `dispatcher_class`. You need to implement the `match()`
+method.
+
+In the case you specify the `request_class` for `AnyEvent::HTTPD` you might
+need to make adaptions to the `match()` method as well.
 
 # SEE ALSO
 

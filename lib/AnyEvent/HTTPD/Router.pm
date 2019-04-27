@@ -269,7 +269,11 @@ constructor.
 =head1 WRITING YOUR OWN ROUTE DISPATCHER
 
 If you want to change the implementation of the dispatching you specify the
-C<dispatcher> or C<dispatcher_class>.
+C<dispatcher> or C<dispatcher_class>. You need to implement the C<match()>
+method.
+
+In the case you specify the C<request_class> for C<AnyEvent::HTTPD> you might
+need to make adaptions to the C<match()> method as well.
 
 =head1 SEE ALSO
 

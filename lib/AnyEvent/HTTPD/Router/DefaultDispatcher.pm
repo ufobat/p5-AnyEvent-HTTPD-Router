@@ -33,9 +33,6 @@ sub add_route {
     }
 }
 
-# TODO doku:
-# if you subclass AnyEvent::HTTPD::Request
-# you might need to change the match code.
 sub match {
     my $self    = shift;
     my $httpd   = shift;
@@ -44,8 +41,6 @@ sub match {
     my @path    = $req->url->path_segments;
     my $method  = $req->method;
 
-    # TODO: is that correct?
-    # accept verb only for GET and POST
     if ( $method eq 'GET' or $method eq 'POST' ) {
         if ( @path[-1] =~ s/:(\w+)$// ) {    # TODO regex for verbs
             $method = $1;
