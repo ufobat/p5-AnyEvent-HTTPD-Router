@@ -40,12 +40,6 @@ sub new {
         },
     );
 
-    $self->reg_cb('no_route_found' => sub {
-        my ( $httpd, $req ) = @_;
-        $req->respond( [ 404, 'not found', {}, '' ] );
-    });
-
-
     if ($routes) {
         $self->reg_routes( @$routes );
     }

@@ -70,6 +70,7 @@
    "x_contributors" : [
       "Martin Barth <martin@senfdax.de>",
       "Martin Barth <ufobat@users.noreply.github.com>",
+      "Paul Koschinski <koschinski@united-domains.de>",
       "koschkosch <49227658+koschkosch@users.noreply.github.com>"
    ],
    "x_serialization_backend" : "JSON::PP version 4.02",
