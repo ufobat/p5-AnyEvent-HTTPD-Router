@@ -114,7 +114,7 @@ don't need to, of course ;-)
 
 - no\_route\_found => $request
 
-    When the dispatcher can not find a route that matches on your reuqest, the
+    When the dispatcher can not find a route that matches on your request, the
     event `no_route_found` will be emitted.
 
     In the case that routes and callbacks (`reg_cb()`) for paths as used with
@@ -135,7 +135,7 @@ don't need to, of course ;-)
             $req->respond( [ 404, 'not found', {}, '' ] );
         });
 
-    This is excatly what you get if you specify `auto_respond_404` at the
+    This is exactly what you get if you specify `auto_respond_404` at the
     constructor.
 
 - See ["EVENTS" in AnyEvent::HTTPD](https://metacpan.org/pod/AnyEvent::HTTPD#EVENTS)

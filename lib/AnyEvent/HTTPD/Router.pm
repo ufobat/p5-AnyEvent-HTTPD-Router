@@ -238,7 +238,7 @@ methods the parent class.
 
 =item * no_route_found => $request
 
-When the dispatcher can not find a route that matches on your reuqest, the
+When the dispatcher can not find a route that matches on your request, the
 event C<no_route_found> will be emitted.
 
 In the case that routes and callbacks (C<reg_cb()>) for paths as used with
@@ -259,7 +259,7 @@ could implement the C<404 not found> handler like this:
         $req->respond( [ 404, 'not found', {}, '' ] );
     });
 
-This is excatly what you get if you specify C<auto_respond_404> at the
+This is exactly what you get if you specify C<auto_respond_404> at the
 constructor.
 
 =item * See L<AnyEvent::HTTPD/EVENTS>
