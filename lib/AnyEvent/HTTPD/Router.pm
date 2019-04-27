@@ -57,16 +57,20 @@ sub reg_routes {
 	## need to get http methods into allowed methods
 	# * remove duplicates
 	# * mix allowed methods and new http methods together
-    # * remove ':verbs' from methods
+    # * convert ':verbs' to POST and GET
     my %methods;
-    $methods{$_}++ for @{$self->allowed_methods}, grep { $_ !~ m/^\:/ } @methods;
+    $methods{$_}++ for map {
+        index($_, ':') == 0
+            ? qw(GET POST) # POST and GET for custom methods
+            : $_
+    } @methods, @{ $self->allowed_methods };
 
 
 	# set allowed methods new
 	# Todo: setter doesnt work in this AE::HTTPD version
 	# so must do push(@{$self->{allowed_methods}}
 	# later we can do setter if AE::HTTPD version is high enough
-    $self->{allowed_methods} = [ keys %methods ];
+    $self->{allowed_methods} = [ sort keys %methods ];
 }
 
 1;
