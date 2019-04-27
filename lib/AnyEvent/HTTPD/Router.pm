@@ -217,7 +217,7 @@ C<AnyEvent::HTTPD::Router> subclasses C<AnyEvent::HTTPD> so you can use all meth
 
 When the dispatcher can not find a route that matches on your reuqest, the event C<no_route_found> will be emitted.
 
-In the case that routes and callbacks (C<reg_cb)) for paths as used with C<AnyEvent::HTTPD> are mixed, keep in mind that that C<no_route_found> will
+In the case that routes and callbacks (C<reg_cb()>) for paths as used with C<AnyEvent::HTTPD> are mixed, keep in mind that that C<no_route_found> will
 happen before the other path callbacks are executed. So for a  C<404 not found> handler you could do
 
     $httpd->reg_cb('' => sub {
