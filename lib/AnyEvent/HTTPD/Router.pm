@@ -43,25 +43,20 @@ sub new {
 
 sub dispatcher { shift->{dispatcher} }
 
-sub _check_verbs {
-    my $verbs = shift;
-    if ( ref($verbs) eq 'ARRAY' ) {
-        foreach my $verb (@$verbs) {
-            return unless _check_verb($verb);
-        }
-        return 1;
-    }
-    return _check_verb($verbs);
-}
-
 sub _check_verb {
-    my $verb = shift;
+    my $verb    = shift;
+    my $methods = shift;
+
     if ( $verb =~ m/^:/ ) {
+        # convert ':verbs' to POST and GET
+        $methods->{$_}++ for qw(GET POST);
         return 1;
     }
-    else {
-        return grep { $verb eq $_ }
-            qw/GET HEAD POST PUT PATCH DELETE TRACE OPTIONS CONNECT/;
+    elsif ( grep { $verb eq $_ }
+        qw/GET HEAD POST PUT PATCH DELETE TRACE OPTIONS CONNECT/ )
+    {
+        $methods->{$verb}++;
+        return 1;
     }
     return;
 }
@@ -71,36 +66,28 @@ sub reg_routes {
 
     croak 'arguments to reg_routes are required' if @_ == 0;
     croak 'arguments to reg_routes are confusing' if @_ % 3 != 0;
-    my @methods = ();
+
+	# * mix allowed methods and new http methods together
+    my %methods = map { $_ => 1 } @{ $self->allowed_methods };
+
     while (my ($verbs, $path, $cb) = splice(@_, 0, 3) ) {
+
+        $verbs = ref($verbs) eq 'ARRAY'
+            ? $verbs
+            : [ $verbs ];
 
         if ( not ref($cb) eq 'CODE' ) {
             croak 'callback must be a coderef';
         }
-        elsif ( not _check_verbs($verbs) ) {
-            croak 'verbs or methods are wrong';
-        }
         elsif ( not $path =~ m/^\// ) {
             croak 'path syntax is wrong';
         }
-
-        $verbs = ref($verbs) eq 'ARRAY' ? $verbs  : [ $verbs ];
-        push @methods, @$verbs;
+        foreach my $verb (@$verbs) {
+            croak 'verbs or methods are wrong' unless _check_verb( $verb, \%methods );
+        }
 
         $self->dispatcher->add_route($verbs, $path, $cb);
     }
-
-	## need to get http methods into allowed methods
-	# * remove duplicates
-	# * mix allowed methods and new http methods together
-    # * convert ':verbs' to POST and GET
-    my %methods;
-    $methods{$_}++ for map {
-        index($_, ':') == 0
-            ? qw(GET POST) # POST and GET for custom methods
-            : $_
-    } @methods, @{ $self->allowed_methods };
-
 
 	# set allowed methods new
 	# Todo: setter doesnt work in this AE::HTTPD version
