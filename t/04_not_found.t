@@ -14,7 +14,7 @@ $h->reg_routes(
     },
 );
 $h->reg_cb(
-    '' => sub {
+    'no_route_found' => sub {
         my ( $httpd, $req ) = @_;
         $req->respond( [ 404, 'not found', {}, '' ] );
         $h->stop_request;

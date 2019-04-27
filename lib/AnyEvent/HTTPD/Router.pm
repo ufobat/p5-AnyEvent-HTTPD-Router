@@ -34,8 +34,17 @@ sub new {
             my $self = shift;
             my $req  = shift;
             my $matched = $self->dispatcher->match( $self, $req );
+            unless ($matched) {
+                $self->event( 'no_route_found' => $req );
+            }
         },
     );
+
+    $self->reg_cb('no_route_found' => sub {
+        my ( $httpd, $req ) = @_;
+        $req->respond( [ 404, 'not found', {}, '' ] );
+    });
+
 
     if ($routes) {
         $self->reg_routes( @$routes );
@@ -197,6 +206,33 @@ you need do add 3 parameters: <method>, <path>, <callback>.
 =item * C<*>
 
 C<AnyEvent::HTTPD::Router> subclasses C<AnyEvent::HTTPD> so you can use all methods the parent class.
+
+=back
+
+=head1 EVENTS
+
+=over
+
+=item * no_route_found => $request
+
+When the dispatcher can not find a route that matches on your reuqest, the event C<no_route_found> will be emitted.
+
+In the case that routes and callbacks (C<reg_cb)) for paths as used with C<AnyEvent::HTTPD> are mixed, keep in mind that that C<no_route_found> will
+happen before the other path callbacks are executed. So for a  C<404 not found> handler you could do
+
+    $httpd->reg_cb('' => sub {
+        my ( $httpd, $req ) = @_;
+        $req->respond( [ 404, 'not found', {}, '' ] );
+    });
+
+If you just use C<reg_routes()> and don't mix with C<reg_cb()> for paths you could implement the C<404 not found> handler like this:
+
+    $httpd->reg_cb('no_route_found' => sub {
+        my ( $httpd, $req ) = @_;
+        $req->respond( [ 404, 'not found', {}, '' ] );
+    });
+
+=item * See L<AnyEvent::HTTPD/EVENTS>
 
 =back
 
