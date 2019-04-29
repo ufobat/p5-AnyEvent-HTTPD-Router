@@ -2,5 +2,7 @@ Revision history for Perl extension AnyEvent::HTTPD::Router
 
 {{$NEXT}}
 
+1.0.0 2019-04-29T12:10:22Z
+
     - original version
 
